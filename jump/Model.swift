@@ -105,9 +105,12 @@ class Player : Element {
         self.graphic?.run(SKAction.playSoundFileNamed("slimeSplash.mp3", waitForCompletion: false))
     }
     func explodeContactedBodies(type target: Element) {
+        var processedCoins: Set<String> = []
+
         if let bodies = self.graphic?.physicsBody?.allContactedBodies() {
             for body: SKPhysicsBody in bodies {
-                if (body.node?.name == target.name) {
+                if let nodeName = body.node?.name, nodeName == target.name, !processedCoins.contains(nodeName) {
+                    processedCoins.insert(nodeName)
                     body.node?.removeFromParent()
                     updateScore(offset: 1)
                     bumb()
