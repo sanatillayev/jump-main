@@ -9,10 +9,11 @@ import SpriteKit
 import GameplayKit
 import CoreMotion
 
-class GameScene: SKScene {
+class GameScene: SKScene, SKPhysicsContactDelegate {
     
     var entities = [GKEntity]()
     var graphs = [String : GKGraph]()
+    
     
     private var lastUpdateTime : TimeInterval = 0
     
@@ -35,6 +36,10 @@ class GameScene: SKScene {
     
     override func sceneDidLoad() {
 
+    }
+    override func didMove(to view: SKView) {
+        self.physicsWorld.contactDelegate = self
+        
         self.lastUpdateTime = 0
         
         
@@ -48,6 +53,7 @@ class GameScene: SKScene {
         if let label = self.label {
             label.text = "X Position"
             label.fontSize = 20
+            label.position = CGPoint(x: 15, y: 270)
             label.fontColor = SKColor.white
             self.addChild(label)
         }
@@ -71,7 +77,6 @@ class GameScene: SKScene {
         }
         move()
     }
-    
     func move(){
        // Make sure the accelerometer hardware is available
        if self.motion.isAccelerometerAvailable {
@@ -98,15 +103,15 @@ class GameScene: SKScene {
                         while(i < player.getMaxAltitude()+500) {
                             if(!self.obstacleAltitude.contains(i)) {
                                 ground.generateNew(altitude: i)
+                                target.generateNew(altitude: i-60)
                                 self.obstacleAltitude.append(i)
                             }
                             i += 400
                         }
                         //update label position on player position
-                        let altitude = Int(player.getPosition().y.rounded())
-                        label.text = "\(Int(altitude)+318)"
-                        label.position = CGPoint(x: player.getPosition().x, y: player.getPosition().y+500)
-                        label.fontColor = SKColor(red: CGFloat(player.tap)/100, green: 1-CGFloat(player.tap)/100, blue: 0.2, alpha: 1)
+                        label.text = "Score: \(player.score)"
+                        label.position = CGPoint(x: player.getPosition().x, y: player.getPosition().y+490)
+                        label.zPosition = 1
                     }
                 }
              }

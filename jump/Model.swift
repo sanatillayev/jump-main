@@ -17,6 +17,7 @@ class Element {
     
     init(gameScene: GameScene, withName name: String, size: CGFloat, initPosition: CGPoint) {
         self.graphic = SKSpriteNode(imageNamed: name)
+        self.graphic?.name = name
         self.scene = gameScene
         self.name = name
         
@@ -29,9 +30,11 @@ class Element {
             graphic.physicsBody?.affectedByGravity = false
             graphic.physicsBody?.pinned = true
             graphic.physicsBody?.isDynamic = true
+            graphic.physicsBody?.contactTestBitMask = graphic.physicsBody?.collisionBitMask ?? 0 // contactTest
             graphic.physicsBody?.mass = (graphic.size.height+graphic.size.width)/2
             graphic.position = initPosition
             print("\(name) loaded successfully")
+            
             scene.addChild(graphic)
         } else {print("error loading \(name)")}
     }
@@ -65,7 +68,7 @@ class Element {
     }
     func generateNew(altitude: CGFloat) {
         if let n = self.graphic?.copy() as! SKSpriteNode?, let scene = self.scene{
-            n.position.x = CGFloat.random(in: -300...300)
+            n.position.x = CGFloat.random(in: -200...200)
             n.position.y = altitude
             n.alpha = 0.0
             n.run(SKAction.fadeIn(withDuration: 0.2))
@@ -103,9 +106,7 @@ class Player : Element {
     }
     func explodeContactedBodies(type target: Element) {
         if let bodies = self.graphic?.physicsBody?.allContactedBodies() {
-            
             for body: SKPhysicsBody in bodies {
-                //print(body.node?.name ?? "no name")
                 if (body.node?.name == target.name) {
                     body.node?.removeFromParent()
                     updateScore(offset: 1)
@@ -135,7 +136,7 @@ class Player : Element {
     }
     func updateScore(offset: Int) {
         score += offset
-        //print("Score updates: \(score)")
+//        print("Score updates: \(score)")
     }
 
 }
